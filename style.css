@@ -1,0 +1,326 @@
+:root {
+            --deep-purple: #6A0DAD;
+            --soft-purple: #9B59B6;
+            --lavender: #E6E6FA;
+            --vibrant-orange: #FF8C00;
+            --peach: #FFDAB9;
+            --dark-gray: #333333;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--dark-gray);
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--deep-purple) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 0.75rem 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Navbar Customization */
+        #username-display {
+            padding: 6px 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar .form-control {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 20px 0 0 20px;
+        }
+
+        .navbar .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .navbar .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+            color: white;
+        }
+
+        .navbar .input-group .btn {
+            border-radius: 0 20px 20px 0;
+        }
+
+        .nav-icons {
+            font-size: 1.2rem;
+        }
+
+        /* Wishlist/Cart Icons */
+        .nav-icon-badge {
+            position: relative;
+        }
+
+        .nav-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--vibrant-orange);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--deep-purple) 0%, var(--vibrant-orange) 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Product Cards */
+        .product-card {
+            transition: all 0.3s ease;
+            height: 100%;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--vibrant-orange);
+        }
+
+        /* Wishlist Button */
+        .btn-wishlist {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            color: var(--dark-gray);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .btn-wishlist:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+
+        .btn-wishlist.active {
+            color: #e74c3c; /* A nice red for the active heart */
+        }
+
+        /* Quick View Modal */
+        .quick-view-modal .modal-content {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .quick-view-img {
+            max-height: 400px;
+            object-fit: contain;
+        }
+
+        /* Cart Fly-in Animation */
+        @keyframes flyToCart {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(var(--fly-x), var(--fly-y)) scale(0.5);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(var(--fly-end-x), var(--fly-end-y)) scale(0.1);
+                opacity: 0;
+            }
+        }
+
+        .fly-animation {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: flyToCart 0.8s ease-out forwards;
+        }
+
+        /* Night Mode Styles */
+body.night-mode {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+.night-mode .card,
+.night-mode .modal-content,
+.night-mode .offcanvas {
+  background-color: #1e1e1e;
+  color: #ffffff;
+  border-color: #333;
+}
+
+.night-mode .card-body,
+.night-mode .modal-body,
+.night-mode .offcanvas-body {
+  background-color: #1e1e1e;
+}
+
+.night-mode .text-muted {
+  color: #aaa !important;
+}
+
+.night-mode .btn-outline-secondary {
+  color: #ccc;
+  border-color: #555;
+}
+
+.night-mode .form-control {
+  background-color: #2d2d2d;
+  color: #fff;
+  border-color: #444;
+}
+
+.night-mode .pagination .page-link {
+  background-color: #2d2d2d;
+  color: #fff;
+  border-color: #444;
+}
+
+.night-mode .pagination .page-item.active .page-link {
+  background-color: var(--vibrant-orange);
+  border-color: var(--vibrant-orange);
+}
+
+        /* Category Filter Styles */
+        .category-filter {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .category-filter h5 {
+            color: var(--deep-purple);
+            font-weight: 600;
+        }
+        
+        .btn-category {
+            border-radius: 20px !important;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid var(--soft-purple);
+            color: var(--soft-purple);
+            background-color: white;
+        }
+        
+        .btn-category:hover {
+            background-color: var(--soft-purple);
+            color: white;
+            transform: translateY(-2px);
+            border-color: var(--soft-purple);
+        }
+        
+        .btn-category.active {
+            background-color: var(--deep-purple);
+            color: white;
+            border-color: var(--deep-purple);
+        }
+        
+        /* Night Mode Category Filter Styles */
+        .night-mode .category-filter {
+            background-color: #2d2d2d;
+            border-color: #444;
+        }
+        
+        .night-mode .category-filter h5 {
+            color: var(--soft-purple);
+        }
+        
+        .night-mode .btn-category {
+            border: 1px solid var(--soft-purple);
+            color: var(--soft-purple);
+            background-color: #1e1e1e;
+        }
+        
+        .night-mode .btn-category:hover {
+            background-color: var(--soft-purple);
+            color: white;
+        }
+        
+        .night-mode .btn-category.active {
+            background-color: var(--vibrant-orange);
+            color: white;
+            border-color: var(--vibrant-orange);
+        }
+
+        /* Custom Utility Classes */
+        .bg-purple {
+            background-color: var(--deep-purple) !important;
+        }
+        
+        .bg-light-purple {
+            background-color: var(--soft-purple) !important;
+            color: white;
+        }
+        
+        .bg-orange {
+            background-color: var(--vibrant-orange) !important;
+        }
+        
+        .btn-orange {
+            background-color: var(--vibrant-orange);
+            color: white;
+            border-color: var(--vibrant-orange);
+        }
+        
+        .btn-orange:hover {
+            background-color: #e67e00; /* A darker shade of orange */
+            border-color: #e67e00;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--deep-purple) !important;
+        } 
