@@ -23,11 +23,14 @@
                 <div class="d-flex align-items-center ms-auto">
 
                     <!-- Search -->
-                    <div class="input-group me-3" style="width: 250px;">
-                        <input type="text" class="form-control" placeholder="Rechercher..." id="searchInput">
-                        <button class="btn btn-outline-light" type="button" id="searchBtn">
-                            <i class="fas fa-search"></i>
-                        </button>
+                    <div class="search-form-container">
+                        <div class="input-group me-3" style="width: 250px;">
+                            <input type="text" class="form-control" placeholder="Rechercher..." id="searchInput" autocomplete="off">
+                            <button class="btn btn-outline-light" type="button" id="searchBtn">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <ul id="search-suggestions"></ul>
                     </div>
 
                     <!-- Night Mode -->
@@ -275,6 +278,11 @@
             <p>&copy; 2024 E-Shop. Tous droits réservés.</p>
         </div>
     </footer>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+        <!-- Toasts will be appended here -->
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>

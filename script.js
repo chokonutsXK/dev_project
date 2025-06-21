@@ -41,12 +41,12 @@ loadNightModePreference() {
                 this.productsPerPage = 12;
                 this.currentCategory = 'all';
                 this.searchQuery = '';
-                this.cart = this.loadCart();
                 this.nightMode = this.loadNightModePreference();
                 this.currentDetailProduct = null;
                 this.detailQuantity = 1;
                 this.currentUser = this.loadUser();
                 this.registeredUsers = this.loadRegisteredUsers();
+                this.cart = this.loadCart();
                 this.wishlist = this.loadWishlist();
                 this.init();
             }
@@ -246,11 +246,38 @@ loadNightModePreference() {
                 // Search
                 const searchInput = document.getElementById('searchInput');
                 const searchBtn = document.getElementById('searchBtn');
+                const suggestionsContainer = document.getElementById('search-suggestions');
+
+                searchInput.addEventListener('input', () => this.displaySearchSuggestions());
+                
+                document.addEventListener('click', (e) => {
+                    const searchContainer = document.querySelector('.search-form-container');
+                    if (searchContainer && !searchContainer.contains(e.target)) {
+                        if (suggestionsContainer) {
+                            suggestionsContainer.style.display = 'none';
+                        }
+                    }
+                });
+                
+                if (suggestionsContainer) {
+                    suggestionsContainer.addEventListener('click', (e) => {
+                        const item = e.target.closest('.suggestion-item');
+                        if (item) {
+                            const productId = parseInt(item.dataset.productId, 10);
+                            this.showProductDetails(productId);
+                            suggestionsContainer.style.display = 'none';
+                            searchInput.value = '';
+                        }
+                    });
+                }
 
                 const performSearch = () => {
-                    this.searchQuery = searchInput.value.trim();
+                    this.searchQuery = searchInput.value;
                     this.currentPage = 1;
                     this.displayProducts();
+                    if (suggestionsContainer) {
+                        suggestionsContainer.style.display = 'none';
+                    }
                 };
 
                 searchBtn.addEventListener('click', performSearch);
@@ -435,88 +462,103 @@ loadNightModePreference() {
             }
 
             saveCart() {
-                localStorage.setItem('cart', JSON.stringify(this.cart));
+                localStorage.setItem(`cart_${this.currentUser.username}`, JSON.stringify(this.cart));
             }
 
             loadCart() {
-                return JSON.parse(localStorage.getItem('cart') || '[]');
+                if (!this.currentUser) return [];
+                return JSON.parse(localStorage.getItem(`cart_${this.currentUser.username}`)) || [];
             }
 
             showToast(message) {
-                // Simple toast notification
-                const toast = document.createElement('div');
-                toast.className = 'toast-notification';
-                toast.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #28a745;
-                    color: white;
-                    padding: 12px 20px;
-                    border-radius: 5px;
-                    z-index: 9999;
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                `;
-                toast.textContent = message;
-                document.body.appendChild(toast);
+                const toastContainer = document.getElementById('toast-container');
+                if (!toastContainer) return;
 
-                setTimeout(() => {
-                    toast.remove();
-                }, 3000);
+                // Clear existing toasts to only show one at a time
+                toastContainer.innerHTML = '';
+
+                const toastId = 'toast-' + Date.now();
+                const toastHTML = `
+                    <div id="${toastId}" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                ${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                `;
+                
+                toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+                
+                const toastElement = document.getElementById(toastId);
+                const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+                toast.show();
+
+                toastElement.addEventListener('hidden.bs.toast', () => {
+                    // It's already cleared on show, but good practice to remove
+                    if (document.body.contains(toastElement)) {
+                        toastElement.remove();
+                    }
+                });
             }
 
-            showProductDetails(productId) {
-                const product = this.products.find(p => p.id === productId);
-                if (!product) return;
-        
-                this.currentDetailProduct = product;
-                this.detailQuantity = 1;
-        
-                const discountPrice = product.price * (1 - product.discountPercentage / 100);
-        
-                document.getElementById('detailProductImage').src = product.images[0] || product.thumbnail;
-                document.getElementById('detailProductTitle').textContent = product.title;
-                document.getElementById('detailDescription').textContent = product.description;
-                document.getElementById('detailPrice').textContent = `${discountPrice.toFixed(2)} €`;
-                document.getElementById('detailRating').innerHTML = `${'★'.repeat(Math.floor(product.rating))}${'☆'.repeat(5 - Math.floor(product.rating))}`;
-                document.getElementById('detailReviews').textContent = `(${product.rating} avis)`;
-                document.getElementById('detailQuantity').textContent = this.detailQuantity;
-        
-                const originalPriceElem = document.getElementById('detailOriginalPrice');
-                const discountElem = document.getElementById('detailDiscount');
-        
-                if (product.discountPercentage > 0) {
-                    originalPriceElem.textContent = `${product.price.toFixed(2)} €`;
-                    discountElem.textContent = `-${Math.round(product.discountPercentage)}%`;
-                    originalPriceElem.style.display = 'inline';
-                    discountElem.style.display = 'inline-block';
-                } else {
-                    originalPriceElem.style.display = 'none';
-                    discountElem.style.display = 'none';
-                }
-        
-                // Thumbnails
-                for(let i=0; i<3; i++) {
-                    const thumb = document.getElementById(`detailThumb${i+1}`);
-                    if(product.images[i]) {
-                        thumb.src = product.images[i];
-                        thumb.style.display = 'inline-block';
-                        thumb.onclick = () => { document.getElementById('detailProductImage').src = product.images[i]; };
+            async showProductDetails(productId) {
+                try {
+                    const product = this.products.find(p => p.id === productId);
+                    if (!product) return;
+            
+                    this.currentDetailProduct = product;
+                    this.detailQuantity = 1;
+            
+                    const discountPrice = product.price * (1 - product.discountPercentage / 100);
+            
+                    document.getElementById('detailProductImage').src = product.images[0] || product.thumbnail;
+                    document.getElementById('detailProductTitle').textContent = product.title;
+                    document.getElementById('detailDescription').textContent = product.description;
+                    document.getElementById('detailPrice').textContent = `${discountPrice.toFixed(2)} €`;
+                    document.getElementById('detailRating').innerHTML = `${'★'.repeat(Math.floor(product.rating))}${'☆'.repeat(5 - Math.floor(product.rating))}`;
+                    document.getElementById('detailReviews').textContent = `(${product.rating} avis)`;
+                    document.getElementById('detailQuantity').textContent = this.detailQuantity;
+            
+                    const originalPriceElem = document.getElementById('detailOriginalPrice');
+                    const discountElem = document.getElementById('detailDiscount');
+            
+                    if (product.discountPercentage > 0) {
+                        originalPriceElem.textContent = `${product.price.toFixed(2)} €`;
+                        discountElem.textContent = `-${Math.round(product.discountPercentage)}%`;
+                        originalPriceElem.style.display = 'inline';
+                        discountElem.style.display = 'inline-block';
                     } else {
-                        thumb.style.display = 'none';
+                        originalPriceElem.style.display = 'none';
+                        discountElem.style.display = 'none';
                     }
+            
+                    // Thumbnails
+                    for(let i=0; i<3; i++) {
+                        const thumb = document.getElementById(`detailThumb${i+1}`);
+                        if(product.images[i]) {
+                            thumb.src = product.images[i];
+                            thumb.style.display = 'inline-block';
+                            thumb.onclick = () => { document.getElementById('detailProductImage').src = product.images[i]; };
+                        } else {
+                            thumb.style.display = 'none';
+                        }
+                    }
+            
+                    // Specs
+                    const specsList = document.getElementById('detailSpecs');
+                    specsList.innerHTML = `
+                        <li><strong>Marque:</strong> ${product.brand}</li>
+                        <li><strong>Catégorie:</strong> ${product.category}</li>
+                        <li><strong>En stock:</strong> ${product.stock}</li>
+                    `;
+            
+                    const modal = new bootstrap.Modal(document.getElementById('productDetailsModal'));
+                    modal.show();
+                } catch (error) {
+                    console.error('Erreur lors de la récupération des détails du produit:', error);
                 }
-        
-                // Specs
-                const specsList = document.getElementById('detailSpecs');
-                specsList.innerHTML = `
-                    <li><strong>Marque:</strong> ${product.brand}</li>
-                    <li><strong>Catégorie:</strong> ${product.category}</li>
-                    <li><strong>En stock:</strong> ${product.stock}</li>
-                `;
-        
-                const modal = new bootstrap.Modal(document.getElementById('productDetailsModal'));
-                modal.show();
             }
         
             increaseQuantity() {
@@ -581,12 +623,16 @@ loadNightModePreference() {
                         this.updateWishlistUI();
                         this.displayProducts(); // Re-render products to show correct wishlist status
 
-                        return;
+                        this.cart = this.loadCart();
+                        this.updateCartUI();
+                        this.showToast('Connexion réussie !');
+
+                        return true;
                     } else {
                         // Wrong password for local user
                         errorDiv.textContent = `Erreur: Mot de passe incorrect.`;
                         errorDiv.style.display = 'block';
-                        return;
+                        return false;
                     }
                 }
 
@@ -622,19 +668,26 @@ loadNightModePreference() {
 
                     this.showToast(`Bienvenue, ${this.currentUser.firstName}! Votre compte a été créé.`);
 
+                    this.cart = this.loadCart();
+                    this.updateCartUI();
+
+                    return true;
                 } catch (error) {
                     errorDiv.textContent = `Erreur: ${error.message}`;
                     errorDiv.style.display = 'block';
+                    return false;
                 }
             }
         
             logout() {
                 this.currentUser = null;
+                this.cart = [];
+                this.wishlist = [];
                 localStorage.removeItem('currentUser');
-                this.wishlist = []; // Clear wishlist on logout
                 this.updateAuthUI();
+                this.updateCartUI();
                 this.updateWishlistUI();
-                this.displayProducts(); // Re-render products for guest view
+                this.displayProducts();
             }
         
             saveUser() {
@@ -835,10 +888,43 @@ loadNightModePreference() {
                 `).join('');
             }
 
+            displaySearchSuggestions() {
+                const searchInput = document.getElementById('searchInput');
+                const suggestionsContainer = document.getElementById('search-suggestions');
+                const query = searchInput.value.toLowerCase().trim();
+
+                if (query.length < 2) {
+                    suggestionsContainer.style.display = 'none';
+                    suggestionsContainer.innerHTML = '';
+                    return;
+                }
+
+                const filtered = this.products.filter(product =>
+                    product.title.toLowerCase().includes(query)
+                ).slice(0, 7);
+
+                if (filtered.length === 0) {
+                    suggestionsContainer.style.display = 'none';
+                    suggestionsContainer.innerHTML = '';
+                    return;
+                }
+
+                suggestionsContainer.innerHTML = filtered.map(product => `
+                    <li class="suggestion-item" data-product-id="${product.id}">
+                        <img src="${product.thumbnail}" alt="${product.title}">
+                        <div class="suggestion-item-info">
+                            <div class="suggestion-item-title">${product.title}</div>
+                            <div class="suggestion-item-category">${product.category}</div>
+                        </div>
+                    </li>
+                `).join('');
+
+                suggestionsContainer.style.display = 'block';
+            }
+
             resetFilters() {
-                document.getElementById('searchInput').value = '';
-                this.searchQuery = '';
                 this.currentCategory = 'all';
+                this.searchQuery = '';
                 this.currentPage = 1;
         
                 // Visually reset category buttons

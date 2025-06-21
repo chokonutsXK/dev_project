@@ -54,6 +54,86 @@
             border-radius: 0 20px 20px 0;
         }
 
+        /* Search Suggestions */
+        .search-form-container {
+            position: relative;
+        }
+
+        #search-suggestions {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1051;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .suggestion-item img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+
+        .suggestion-item-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .suggestion-item-title {
+            font-weight: 600;
+        }
+
+        .suggestion-item-category {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .night-mode #search-suggestions {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .night-mode .suggestion-item {
+            border-bottom-color: #3a3a3a;
+            color: #e0e0e0;
+        }
+        
+        .night-mode .suggestion-item:hover {
+            background-color: #3c4043;
+        }
+
+        .night-mode .suggestion-item-category {
+            color: #aaa;
+        }
+
         .nav-icons {
             font-size: 1.2rem;
         }
